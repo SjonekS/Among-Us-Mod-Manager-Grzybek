@@ -1051,18 +1051,8 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void OpenModBrowser()
     {
-        try
-        {
-            var window = App.Services.GetRequiredService<ModBrowserWindow>();
-            window.Owner = Application.Current.MainWindow;
-            window.Show();
-            AddLog("Otwarto Przeglądarkę Modów (Mod Browser).");
-        }
-        catch (Exception ex)
-        {
-            AddLog($"Błąd otwierania Mod Browsera: {ex.Message}");
-            MessageBox.Show($"Nie udało się otworzyć Przeglądarki Modów:\n\n{ex.Message}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        SelectedTabIndex = 2;
+        AddLog("Przełączono na zintegrowaną Przeglądarkę Modów.");
     }
 
     [RelayCommand]
