@@ -32,7 +32,7 @@ public partial class GitHubReleaseService : IGitHubReleaseService
         DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower
     };
 
-    [GeneratedRegex(@"v?(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?:\.(?<build>\d+))?", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"v?(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?:\.(?<build>\d+))?(?:[.\-_]?(?<letter>[a-zA-Z])(?![a-zA-Z]))?", RegexOptions.IgnoreCase)]
     private static partial Regex VersionRegex();
 
     [GeneratedRegex(@"href=""(/[^""]+/releases/download/[^""]+TouMira[^""]+\.zip)""", RegexOptions.IgnoreCase)]
@@ -373,16 +373,52 @@ public partial class GitHubReleaseService : IGitHubReleaseService
         int major = int.Parse(match.Groups["major"].Value);
         int minor = int.Parse(match.Groups["minor"].Value);
         int patch = int.Parse(match.Groups["patch"].Value);
-        Version version;
-        string rawVersion;
-        if (match.Groups["build"].Success && int.TryParse(match.Groups["build"].Value, out int build))
+
+        int buildVal = 0;
+        bool hasBuild = match.Groups["build"].Success && int.TryParse(match.Groups["build"].Value, out buildVal);
+        bool hasLetter = match.Groups["letter"].Success && !string.IsNullOrEmpty(match.Groups["letter"].Value);
+
+        int letterVal = 0;
+        string letterStr = "";
+        if (hasLetter)
         {
-            version = new Version(major, minor, patch, build);
-            rawVersion = $"v{major}.{minor}.{patch}.{build}";
+            letterStr = match.Groups["letter"].Value.ToLowerInvariant();
+            letterVal = letterStr[0] - 'a' + 1;
+        }
+
+        int finalBuild = 0;
+        if (hasBuild && hasLetter)
+        {
+            finalBuild = (buildVal * 100) + letterVal;
+        }
+        else if (hasBuild)
+        {
+            finalBuild = buildVal;
+        }
+        else if (hasLetter)
+        {
+            finalBuild = letterVal;
+        }
+
+        Version version = finalBuild > 0 
+            ? new Version(major, minor, patch, finalBuild)
+            : new Version(major, minor, patch);
+
+        string rawVersion;
+        if (hasBuild && hasLetter)
+        {
+            rawVersion = $"v{major}.{minor}.{patch}.{buildVal}{letterStr}";
+        }
+        else if (hasBuild)
+        {
+            rawVersion = $"v{major}.{minor}.{patch}.{buildVal}";
+        }
+        else if (hasLetter)
+        {
+            rawVersion = $"v{major}.{minor}.{patch}{letterStr}";
         }
         else
         {
-            version = new Version(major, minor, patch);
             rawVersion = $"v{major}.{minor}.{patch}";
         }
 

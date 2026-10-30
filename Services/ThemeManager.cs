@@ -9,7 +9,7 @@ public static class ThemeManager
 {
     public static readonly List<ThemeDefinition> AvailableThemes = new()
     {
-        new("Starlight", "Starlight Nebula (Fiolet)", "Nowoczesny kosmiczny motyw z głębokim fioletem, grafitowym tłem i neonowym akcentem.", "#8B5CF6"),
+        new("Nebula", "Nebula Purple (Głęboki Fiolet)", "Nowoczesny kosmiczny motyw z głębokim fioletem, grafitowym tłem i neonowym akcentem.", "#8B5CF6"),
         new("CyberNeon", "Cyberpunk Neon (Cyan)", "Ciemny kontrastowy motyw z elektryzującym neonowym turkusem.", "#06B6D4"),
         new("Midnight", "Midnight Obsidian (Onyks)", "Ultra-ciemny motyw głębokiej nocy z wyrazistym białym tekstem i chłodnym błękitem.", "#3B82F6"),
         new("SteelBlue", "Stalowy Błękit", "Klasyczny ciemny motyw inżynieryjny z neutralnym błękitem.", "#2563EB"),
@@ -43,6 +43,7 @@ public static class ThemeManager
 
         switch (themeId)
         {
+            case "Nebula":
             case "Starlight":
                 SetBrush("WindowBackground", "#0B0B14");
                 SetBrush("CardBackground", "#121124");

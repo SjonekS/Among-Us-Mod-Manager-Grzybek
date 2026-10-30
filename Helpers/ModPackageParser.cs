@@ -10,7 +10,7 @@ public record PackageParseResult(bool IsSuccess, string? ErrorMessage, ModPackag
 public static partial class ModPackageParser
 {
     // Flexible version regex matching vX.Y.Z anywhere in string (e.g. "v1.7.3")
-    [GeneratedRegex(@"v?(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?:\.(?<build>\d+))?", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"v?(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?:\.(?<build>\d+))?(?:[.\-_]?(?<letter>[a-zA-Z])(?![a-zA-Z]))?", RegexOptions.IgnoreCase)]
     private static partial Regex VersionPattern();
 
     [GeneratedRegex(@"(?<arch>x86|x64)", RegexOptions.IgnoreCase)]
@@ -101,16 +101,52 @@ public static partial class ModPackageParser
         int major = int.Parse(versionMatch.Groups["major"].Value);
         int minor = int.Parse(versionMatch.Groups["minor"].Value);
         int patch = int.Parse(versionMatch.Groups["patch"].Value);
-        Version version;
-        string rawVersion;
-        if (versionMatch.Groups["build"].Success && int.TryParse(versionMatch.Groups["build"].Value, out int build))
+
+        int buildVal = 0;
+        bool hasBuild = versionMatch.Groups["build"].Success && int.TryParse(versionMatch.Groups["build"].Value, out buildVal);
+        bool hasLetter = versionMatch.Groups["letter"].Success && !string.IsNullOrEmpty(versionMatch.Groups["letter"].Value);
+
+        int letterVal = 0;
+        string letterStr = "";
+        if (hasLetter)
         {
-            version = new Version(major, minor, patch, build);
-            rawVersion = $"v{major}.{minor}.{patch}.{build}";
+            letterStr = versionMatch.Groups["letter"].Value.ToLowerInvariant();
+            letterVal = letterStr[0] - 'a' + 1;
+        }
+
+        int finalBuild = 0;
+        if (hasBuild && hasLetter)
+        {
+            finalBuild = (buildVal * 100) + letterVal;
+        }
+        else if (hasBuild)
+        {
+            finalBuild = buildVal;
+        }
+        else if (hasLetter)
+        {
+            finalBuild = letterVal;
+        }
+
+        Version version = finalBuild > 0 
+            ? new Version(major, minor, patch, finalBuild)
+            : new Version(major, minor, patch);
+
+        string rawVersion;
+        if (hasBuild && hasLetter)
+        {
+            rawVersion = $"v{major}.{minor}.{patch}.{buildVal}{letterStr}";
+        }
+        else if (hasBuild)
+        {
+            rawVersion = $"v{major}.{minor}.{patch}.{buildVal}";
+        }
+        else if (hasLetter)
+        {
+            rawVersion = $"v{major}.{minor}.{patch}{letterStr}";
         }
         else
         {
-            version = new Version(major, minor, patch);
             rawVersion = $"v{major}.{minor}.{patch}";
         }
 

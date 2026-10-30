@@ -1,6 +1,6 @@
 # 🛸 Among Us Mod Manager (Grzybek) v3.0
 
-> Nowoczesny, modułowy menedżer i instalator modyfikacji dla **Among Us** inspirowany interfejsem **Starlight-PC**.
+> Nowoczesny, modułowy menedżer i instalator modyfikacji dla **Among Us** z nowoczesnym, przejrzystym interfejsem.
 
 [![Platform](https://img.shields.io/badge/platform-Windows%20x64-blue.svg)](https://dotnet.microsoft.com/)
 [![.NET](https://img.shields.io/badge/.NET-10.0%20WPF-purple.svg)](https://dotnet.microsoft.com/)
@@ -33,7 +33,7 @@
    - Wbudowany podgląd dziennika zdarzeń na żywo.
 
 5. **⚙ Personalizacja & Kopie Zapasowe**:
-   - Motywy kolorystyczne: **Starlight Nebula**, **Cyberpunk Neon**, **Midnight Obsidian** i inne.
+   - Motywy kolorystyczne: **Nebula Purple**, **Cyberpunk Neon**, **Midnight Obsidian** i inne.
    - Automatyczne tworzenie kopii zapasowych (ZIP) przed każdą instalacją z inteligentną rotacją.
 
 6. **🎓 Interaktywny Samouczek Spotlight**:

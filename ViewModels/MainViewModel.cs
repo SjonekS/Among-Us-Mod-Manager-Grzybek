@@ -224,7 +224,7 @@ public partial class MainViewModel : ObservableObject
             case 1:
                 TourIcon = "🛸";
                 TourTitle = "Witaj w Among Us Mod Manager v3.0!";
-                TourDescription = "Aplikacja została zaprojektowana od nowa w przejrzystym stylu Starlight. Zero chaosu – wszystkie narzędzia masz podzielone na 5 wygodnych kategorii powyżej.";
+                TourDescription = "Aplikacja została zaprojektowana od nowa w nowoczesnym i przejrzystym stylu. Zero chaosu – wszystkie narzędzia masz podzielone na 5 wygodnych kategorii powyżej.";
                 SelectedTabIndex = 0;
                 break;
             case 2:
@@ -301,7 +301,7 @@ public partial class MainViewModel : ObservableObject
     private void LoadInitialData()
     {
         AutoBackup = _configService.Config.AutoBackupBeforeUpdate;
-        SelectedThemeId = string.IsNullOrWhiteSpace(_configService.Config.SelectedTheme) ? "Starlight" : _configService.Config.SelectedTheme;
+        SelectedThemeId = string.IsNullOrWhiteSpace(_configService.Config.SelectedTheme) ? "Nebula" : _configService.Config.SelectedTheme;
         SelectedTheme = AvailableThemes.FirstOrDefault(t => t.Id == SelectedThemeId) ?? AvailableThemes[0];
         ThemeManager.ApplyTheme(SelectedTheme.Id);
 
@@ -309,7 +309,7 @@ public partial class MainViewModel : ObservableObject
         RefreshGamePath();
         RefreshBackupsCount();
         _ = RefreshInstancesAsync();
-        AddLog("Aplikacja Among Us Mod Manager v3.0 (Tryb Starlight) uruchomiona.");
+        AddLog("Aplikacja Among Us Mod Manager v3.0 uruchomiona.");
 
         // Sprawdź aktualizacje automatycznie w tle przy starcie
         _ = CheckForUpdatesAsync(isInitialCheck: true);

@@ -265,7 +265,7 @@
             </Setter>
         </Style>
 
-        <!-- Styl Kafelka Kategorii (Starlight Category Tile Button) -->
+        <!-- Styl Kafelka Kategorii (Modern Category Tile Button) -->
         <Style x:Key="CategoryTileButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="108" />
             <Setter Property="Height" Value="80" />
@@ -313,7 +313,7 @@
             <RowDefinition Height="Auto" /> <!-- 4: Pasek Statusu na dole -->
         </Grid.RowDefinitions>
 
-        <!-- 0. Top Level Header: Tytuł, Wersja i Przycisk Uruchomienia Gry (Styl Starlight) -->
+        <!-- 0. Top Level Header: Tytuł, Wersja i Przycisk Uruchomienia Gry (Modern Header) -->
         <Grid Grid.Row="0" Margin="0,0,0,16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -361,7 +361,7 @@
             </StackPanel>
         </Grid>
 
-        <!-- 1. Dedykowany Pasek Kategorii (Starlight Category Bar) -->
+        <!-- 1. Dedykowany Pasek Kategorii (Category Navigation Bar) -->
         <Border Grid.Row="1" Background="{DynamicResource CardBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="10" Padding="12,10" Margin="0,0,0,16">
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" PanningMode="HorizontalOnly">
                 <StackPanel Orientation="Horizontal">
@@ -958,7 +958,7 @@
             </Border>
 
             <!-- ======================================================== -->
-            <!-- ZAKŁADKA 2: ZINTEGROWANA PRZEGLĄDARKA MODÓW (STARLIGHT)  -->
+            <!-- ZAKŁADKA 2: ZINTEGROWANA PRZEGLĄDARKA MODÓW  -->
             <!-- ======================================================== -->
             <Border Background="{DynamicResource CardBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="10" Padding="20"
                     DataContext="{Binding ModBrowser}">
@@ -1052,7 +1052,7 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- Siatka Kart Modów w stylu Starlight (2 Równe Kolumny) -->
+                    <!-- Siatka Kart Modów (2 Równe Kolumny) -->
                     <Grid Grid.Row="2">
                         <Border Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="12">
                             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -1064,7 +1064,7 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <!-- Karta Modyfikacji w stylu Starlight Launcher -->
+                                            <!-- Karta Modyfikacji  -->
                                             <Border MinHeight="175" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="6" Padding="14" Cursor="Hand">
                                                 <Border.InputBindings>
                                                     <MouseBinding MouseAction="LeftClick" 
@@ -1633,7 +1633,7 @@
         </Border>
 
         <!-- ======================================================== -->
-        <!-- 5b. MODAL SZCZEGÓŁÓW MODA W STYLU STARLIGHT (ROOT GRID)  -->
+        <!-- 5b. MODAL SZCZEGÓŁÓW MODA (ROOT GRID)  -->
         <!-- ======================================================== -->
         <Border Grid.RowSpan="5" Background="#E6070A10"
                 Visibility="{Binding ModBrowser.IsDetailsOpen, Converter={StaticResource BoolToVis}}"
