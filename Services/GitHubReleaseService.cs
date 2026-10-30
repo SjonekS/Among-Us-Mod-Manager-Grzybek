@@ -67,6 +67,7 @@ public partial class GitHubReleaseService : IGitHubReleaseService
                 var root = doc.RootElement;
 
                 var tagName = root.TryGetProperty("tag_name", out var tagElem) ? tagElem.GetString() ?? "" : "";
+                var bodyText = root.TryGetProperty("body", out var bodyElem) ? bodyElem.GetString() ?? "" : "";
                 DateTimeOffset? publishedAt = null;
                 if (root.TryGetProperty("published_at", out var pubElem) && DateTimeOffset.TryParse(pubElem.GetString(), out var dt))
                 {
@@ -105,7 +106,8 @@ public partial class GitHubReleaseService : IGitHubReleaseService
                             AssetName = chosen.Name,
                             DownloadUrl = chosen.DownloadUrl,
                             SizeBytes = chosen.Size,
-                            PublishedAt = publishedAt
+                            PublishedAt = publishedAt,
+                            ReleaseNotes = bodyText
                         };
                     }
                 }
@@ -184,6 +186,7 @@ public partial class GitHubReleaseService : IGitHubReleaseService
                 var root = doc.RootElement;
 
                 var tagName = root.TryGetProperty("tag_name", out var tagElem) ? tagElem.GetString() ?? "" : "";
+                var bodyText = root.TryGetProperty("body", out var bodyElem) ? bodyElem.GetString() ?? "" : "";
                 DateTimeOffset? publishedAt = null;
                 if (root.TryGetProperty("published_at", out var pubElem) && DateTimeOffset.TryParse(pubElem.GetString(), out var dt))
                 {

@@ -282,8 +282,16 @@
                 </Border>
             </StackPanel>
 
-            <!-- Prawa strona: Przycisk Uruchomienia Gry Steam oraz Samouczek -->
+            <!-- Prawa strona: Przycisk Uruchomienia Gry Steam, Samouczek oraz Aktualizacja -->
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <!-- Pulsujący Przycisk Dostępnej Aktualizacji Launchera -->
+                <Button Content="✨ Aktualizacja menedżera" 
+                        Background="#2D1A4E" Foreground="#E9D5FF" BorderBrush="#A855F7" BorderThickness="1"
+                        Padding="14,9" Margin="0,0,10,0" FontSize="12" FontWeight="Bold" Cursor="Hand"
+                        Visibility="{Binding IsLauncherUpdateAvailable, Converter={StaticResource BoolToVis}}"
+                        Command="{Binding OpenLauncherUpdateModalCommand}"
+                        ToolTip="Dostępna jest nowa wersja menedżera! Kliknij, aby zobaczyć zmiany i zaktualizować." />
+
                 <Button Content="🎓 Samouczek" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0" Padding="14,9" Command="{Binding StartTourCommand}" ToolTip="Uruchom interaktywny przewodnik po aplikacji" />
                 <Button Content="🚀 Uruchom grę Steam" Style="{StaticResource PrimaryButtonStyle}" Padding="20,9" Command="{Binding LaunchGameCommand}" IsEnabled="{Binding IsGamePathValid}" ToolTip="Uruchom grę z oficjalnej instalacji Steam" />
             </StackPanel>
@@ -1561,6 +1569,80 @@
 
                         <!-- Dalej / Zakończ -->
                         <Button Grid.Column="3" Content="Dalej ➔" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding NextTourStepCommand}" Padding="18,8" FontSize="12" />
+                    </Grid>
+                </Grid>
+            </Border>
+        </Border>
+
+        <!-- ======================================================== -->
+        <!-- 6. MODAL AKTUALIZACJI MENEDŻERA (AUTOUPDATER DIALOG)     -->
+        <!-- ======================================================== -->
+        <Border Grid.RowSpan="5" Background="#E6070A10"
+                Visibility="{Binding IsLauncherUpdateModalOpen, Converter={StaticResource BoolToVis}}"
+                Panel.ZIndex="350"
+                SnapsToDevicePixels="True">
+            <Border Background="{DynamicResource CardBackground}" BorderBrush="{DynamicResource AccentColor}" BorderThickness="2" CornerRadius="14" Padding="28,24" MaxWidth="520" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" /> <!-- Nagłówek -->
+                        <RowDefinition Height="*" />    <!-- Opis / Changelog -->
+                        <RowDefinition Height="Auto" /> <!-- Przyciski akcji -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Nagłówek -->
+                    <Grid Grid.Row="0" Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <Border Background="{DynamicResource HeaderBadgeBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="4" Padding="8,2" Margin="0,0,8,0">
+                                    <TextBlock Text="{Binding LauncherLatestRelease.VersionString, StringFormat='WYDANIE {0}'}" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource HeaderBadgeFg}" />
+                                </Border>
+                                <Border Background="#10B981" CornerRadius="4" Padding="6,1" VerticalAlignment="Center">
+                                    <TextBlock Text="Zalecana aktualizacja" FontSize="10" FontWeight="Bold" Foreground="#FFFFFF" />
+                                </Border>
+                            </StackPanel>
+                            <TextBlock Text="Dostępna jest nowa wersja menedżera!" FontSize="18" FontWeight="Bold" Foreground="#FFFFFF" />
+                        </StackPanel>
+
+                        <Button Grid.Column="1" Style="{StaticResource CloseIconButtonStyle}" Command="{Binding CloseLauncherUpdateModalCommand}" ToolTip="Zamknij" VerticalAlignment="Top" />
+                    </Grid>
+
+                    <!-- Informacje o wydaniu i opis zmian -->
+                    <StackPanel Grid.Row="1" Margin="0,0,0,20">
+                        <Border Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="Informacje o pliku instalatora:" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,6" />
+                                <TextBlock Text="{Binding LauncherLatestRelease.AssetName, StringFormat='Plik: {0}'}" FontSize="12" Foreground="{DynamicResource SubTextColor}" />
+                                <TextBlock Text="{Binding LauncherLatestRelease.SizeBytes, StringFormat='Rozmiar: {0:N0} bajtów'}" FontSize="12" Foreground="{DynamicResource SubTextColor}" Margin="0,2,0,0" />
+                                <TextBlock Text="Repozytorium: SjonekS/Among-Us-Mod-Manager-Grzybek" FontSize="11" Foreground="{DynamicResource SubTextColor}" Margin="0,2,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="Co nowego w tej wersji:" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,6" />
+                        <Border Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="14" MaxHeight="180">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <TextBlock Text="{Binding LauncherLatestRelease.ReleaseNotes, TargetNullValue='Brak opisu zmian dla tego wydania.'}" 
+                                           FontSize="12" Foreground="#CBD5E1" TextWrapping="Wrap" LineHeight="18" />
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Przyciski akcji -->
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="{Binding LauncherUpdateStatus}" FontSize="12" Foreground="{DynamicResource AccentColor}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" />
+
+                        <Button Grid.Column="1" Content="Przypomnij później" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding CloseLauncherUpdateModalCommand}" Margin="0,0,8,0" Padding="14,8" FontSize="12" />
+                        <Button Grid.Column="2" Content="⚡ Zaktualizuj teraz" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ApplyLauncherUpdateCommand}" Padding="18,8" FontSize="12" />
                     </Grid>
                 </Grid>
             </Border>

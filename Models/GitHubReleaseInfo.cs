@@ -9,4 +9,5 @@ public class GitHubReleaseInfo
     public string DownloadUrl { get; set; } = "";
     public long SizeBytes { get; set; }
     public DateTimeOffset? PublishedAt { get; set; }
+    public string ReleaseNotes { get; set; } = "";
 }

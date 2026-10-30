@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -149,6 +149,23 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private double _tourProgressPercent = 20;
+
+    // --- Autoupdater Launchera (Repozytorium SjonekS/Among-Us-Mod-Manager-Grzybek) ---
+    public const string CurrentLauncherVersion = "3.0.0";
+    public const string LauncherRepoOwner = "SjonekS";
+    public const string LauncherRepoName = "Among-Us-Mod-Manager-Grzybek";
+
+    [ObservableProperty]
+    private bool _isLauncherUpdateAvailable;
+
+    [ObservableProperty]
+    private GitHubReleaseInfo? _launcherLatestRelease;
+
+    [ObservableProperty]
+    private bool _isLauncherUpdateModalOpen;
+
+    [ObservableProperty]
+    private string _launcherUpdateStatus = "";
 
     [RelayCommand]
     public void StartTour()
@@ -465,6 +482,132 @@ public partial class MainViewModel : ObservableObject
             IsProgressIndeterminate = false;
             ProgressTitle = "";
             ProgressDetail = "";
+        }
+
+        // Sprawdz również czy jest nowa wersja samego launchera
+        _ = CheckForLauncherUpdatesAsync();
+    }
+
+    [RelayCommand]
+    public async Task CheckForLauncherUpdatesAsync()
+    {
+        try
+        {
+            var release = await _gitHubService.GetLatestReleaseForRepoAsync(
+                LauncherRepoOwner, 
+                LauncherRepoName, 
+                assetFilter: ".exe", 
+                logCallback: msg => AddLog(msg));
+
+            if (release != null)
+            {
+                LauncherLatestRelease = release;
+
+                Version.TryParse(CurrentLauncherVersion, out var localVer);
+                localVer ??= new Version(3, 0, 0);
+
+                if (release.Version > localVer)
+                {
+                    IsLauncherUpdateAvailable = true;
+                    AddLog($"Dostępna nowa wersja menedżera: v{CurrentLauncherVersion} -> {release.VersionString}!");
+                }
+                else
+                {
+                    IsLauncherUpdateAvailable = false;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            AddLog($"Nie udało się sprawdzić aktualizacji menedżera: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    private void OpenLauncherUpdateModal()
+    {
+        if (LauncherLatestRelease != null)
+        {
+            IsLauncherUpdateModalOpen = true;
+        }
+    }
+
+    [RelayCommand]
+    private void CloseLauncherUpdateModal()
+    {
+        IsLauncherUpdateModalOpen = false;
+    }
+
+    [RelayCommand]
+    private async Task ApplyLauncherUpdateAsync()
+    {
+        if (LauncherLatestRelease == null || string.IsNullOrEmpty(LauncherLatestRelease.DownloadUrl))
+        {
+            MessageBox.Show("Brak informacji o pliku instalatora.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var currentProcessPath = Environment.ProcessPath;
+        if (string.IsNullOrEmpty(currentProcessPath) || !File.Exists(currentProcessPath))
+        {
+            MessageBox.Show("Nie udało się ustalić ścieżki do bieżącej aplikacji.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
+        IsBusy = true;
+        IsProgressIndeterminate = false;
+        ProgressTitle = $"Pobieranie aktualizacji menedżera ({LauncherLatestRelease.VersionString})...";
+        LauncherUpdateStatus = "Pobieranie nowego pliku...";
+
+        try
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), "AmongUsModManager_Update");
+            Directory.CreateDirectory(tempDir);
+            var downloadedNewExe = Path.Combine(tempDir, "AmongUsModManager_new.exe");
+
+            var progress = new Progress<OperationProgress>(p =>
+            {
+                ProgressPercentage = p.Percentage;
+                ProgressDetail = $"{p.Percentage:F0}%";
+            });
+
+            var downloadedFile = await _gitHubService.DownloadAssetAsync(LauncherLatestRelease, tempDir, progress, msg => AddLog(msg));
+            if (!File.Exists(downloadedFile))
+            {
+                throw new FileNotFoundException("Pobrany plik nie został odnaleziony.");
+            }
+            downloadedNewExe = downloadedFile;
+
+            if (!File.Exists(downloadedNewExe))
+            {
+                throw new FileNotFoundException("Pobrany plik nie został odnaleziony.");
+            }
+
+            LauncherUpdateStatus = "Restartowanie aplikacji...";
+            AddLog("Pobrano aktualizację. Uruchamianie procedury zamiany pliku...");
+
+            // Przygotuj skrypt PowerShell do podmiany pliku i ponownego uruchomienia po zamknięciu procesu
+            var script = $"Start-Sleep -Milliseconds 1000; " +
+                         $"Move-Item -Path '{downloadedNewExe}' -Destination '{currentProcessPath}' -Force; " +
+                         $"Start-Process -FilePath '{currentProcessPath}'";
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "powershell.exe",
+                Arguments = $"-NoProfile -WindowStyle Hidden -Command \"{script}\"",
+                UseShellExecute = false,
+                CreateNoWindow = true
+            });
+
+            Application.Current.Shutdown();
+        }
+        catch (Exception ex)
+        {
+            IsBusy = false;
+            ProgressTitle = "";
+            LauncherUpdateStatus = $"Błąd: {ex.Message}";
+            AddLog($"BŁĄD aktualizacji menedżera: {ex.Message}");
+            MessageBox.Show($"Nie udało się pobrać aktualizacji:\n\n{ex.Message}", "Błąd aktualizacji", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
