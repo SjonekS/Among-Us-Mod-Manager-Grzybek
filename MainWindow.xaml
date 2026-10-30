@@ -992,6 +992,7 @@
                         <RowDefinition Height="Auto" /> <!-- Nagłówek Zakładki w lewym górnym rogu -->
                         <RowDefinition Height="Auto" /> <!-- Pasek górny Przeglądarki: Wybór Celu + Wyszukiwarka + Filtry -->
                         <RowDefinition Height="*" />    <!-- Siatka modów -->
+                        <RowDefinition Height="Auto" /> <!-- Pasek paginacji -->
                     </Grid.RowDefinitions>
 
                     <!-- Nagłówek Zakładki w Lewym Górnym Rogu -->
@@ -1051,20 +1052,20 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- Siatka Kart Modów w stylu Starlight -->
+                    <!-- Siatka Kart Modów w stylu Starlight (2 Równe Kolumny) -->
                     <Grid Grid.Row="2">
                         <Border Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="12">
                             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                                <ItemsControl ItemsSource="{Binding FilteredMods}">
+                                <ItemsControl ItemsSource="{Binding PagedMods}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <WrapPanel Orientation="Horizontal" />
+                                            <UniformGrid Columns="2" />
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <!-- Karta Modyfikacji w stylu Starlight Launcher -->
-                                            <Border Width="295" MinHeight="175" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="5" Padding="14" Cursor="Hand">
+                                            <Border MinHeight="175" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="6" Padding="14" Cursor="Hand">
                                                 <Border.InputBindings>
                                                     <MouseBinding MouseAction="LeftClick" 
                                                                   Command="{Binding DataContext.ModBrowser.SelectModCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
@@ -1227,169 +1228,26 @@
                                 </ItemsControl>
                             </ScrollViewer>
                         </Border>
-
-                        <!-- MODAL SZCZEGÓŁÓW MODA W STYLU STARLIGHT (POWIĘKSZONY 780x580) -->
-                        <Border Background="#D9000000" CornerRadius="8" Padding="20"
-                                Visibility="{Binding IsDetailsOpen, Converter={StaticResource BoolToVis}}"
-                                Panel.ZIndex="100">
-                            <Border Background="{DynamicResource CardBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="12" Padding="24" MaxWidth="780" MaxHeight="580" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <Border.RenderTransform>
-                                    <TranslateTransform Y="0" />
-                                </Border.RenderTransform>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" /> <!-- Header -->
-                                        <RowDefinition Height="*" />    <!-- 2-Column Content -->
-                                        <RowDefinition Height="Auto" /> <!-- Footer -->
-                                    </Grid.RowDefinitions>
-
-                                    <!-- 1. Header: Ikona, Nazwa, Autor, Kategoria oraz Przycisk GitHub i Zamknij [X] -->
-                                    <Grid Grid.Row="0" Margin="0,0,0,16">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <!-- Ikona Moda -->
-                                        <Border Grid.Column="0" Width="56" Height="56" CornerRadius="10" Background="{DynamicResource CardBorder}" Margin="0,0,14,0" VerticalAlignment="Center">
-                                            <Grid>
-                                                <TextBlock Text="📦" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                <Border CornerRadius="10">
-                                                    <Border.Background>
-                                                        <ImageBrush ImageSource="{Binding SelectedMod.DisplayIcon}" Stretch="UniformToFill" />
-                                                    </Border.Background>
-                                                </Border>
-                                            </Grid>
-                                        </Border>
-
-                                        <!-- Nazwa i Kategoria -->
-                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding SelectedMod.Name}" FontSize="20" FontWeight="Bold" Foreground="#FFFFFF" />
-                                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                                                <Border Background="{DynamicResource HeaderBadgeBg}" CornerRadius="4" Padding="7,2" Margin="0,0,8,0">
-                                                    <TextBlock Text="{Binding SelectedMod.Category, StringFormat='Kategoria: {0}'}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource HeaderBadgeFg}" />
-                                                </Border>
-                                                <TextBlock Text="{Binding SelectedMod.Author, StringFormat='Autor: {0}'}" FontSize="12" Foreground="{DynamicResource SubTextColor}" VerticalAlignment="Center" />
-                                            </StackPanel>
-                                        </StackPanel>
-
-                                        <!-- Przycisk GitHub oraz 'X' -->
-                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                            <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding OpenProjectPageCommand}" ToolTip="Otwórz repozytorium GitHub tego moda" Margin="0,0,10,0" Padding="10,6">
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="🐙" Margin="0,0,6,0" FontSize="13" />
-                                                    <TextBlock Text="Strona GitHub" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                                </StackPanel>
-                                            </Button>
-                                            <Button Style="{StaticResource CloseIconButtonStyle}" Command="{Binding CloseDetailsCommand}" ToolTip="Zamknij podgląd" VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </Grid>
-
-                                    <!-- 2. Treść Główna: 2 Kolumny (Lewa: Opis & Wersje, Prawa: Changelog) -->
-                                    <Grid Grid.Row="1" Margin="0,0,0,16">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="1.1*" />
-                                            <ColumnDefinition Width="0.9*" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <!-- Lewa Kolumna: Opis, Wybór Wersji i Info Techniczne -->
-                                        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="0,0,8,0">
-                                            <StackPanel>
-                                                <TextBlock Text="O modyfikacji:" FontSize="13" FontWeight="Bold" Foreground="#E0E0E6" Margin="0,0,0,6" />
-                                                <Border Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,0,0,12">
-                                                    <TextBlock Text="{Binding SelectedMod.Description}" FontSize="12.5" Foreground="#CBD5E1" TextWrapping="Wrap" LineHeight="18" />
-                                                </Border>
-
-                                                <TextBlock Text="Wybór wersji do instalacji:" FontSize="13" FontWeight="Bold" Foreground="#E0E0E6" Margin="0,0,0,6" />
-                                                <Border Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,0,0,12">
-                                                    <StackPanel>
-                                                        <TextBlock Text="Dostępne wydania na GitHubie:" FontSize="11" Foreground="{DynamicResource SubTextColor}" Margin="0,0,0,6" />
-                                                        <TextBlock Text="⏳ Pobieranie listy wydań..." FontSize="11" Foreground="{DynamicResource AccentColor}" Margin="0,0,0,4" Visibility="{Binding IsLoadingReleases, Converter={StaticResource BoolToVis}}" />
-                                                        <ComboBox ItemsSource="{Binding AvailableReleases}" SelectedItem="{Binding SelectedRelease}" Height="34" VerticalContentAlignment="Center" Margin="0,0,0,6">
-                                                            <ComboBox.ItemTemplate>
-                                                                <DataTemplate>
-                                                                    <StackPanel Orientation="Horizontal">
-                                                                        <TextBlock Text="{Binding VersionString}" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,8,0" />
-                                                                        <TextBlock Text="{Binding PublishedAt, StringFormat='({0:yyyy-MM-dd})'}" Foreground="#94A3B8" FontSize="11" VerticalAlignment="Center" />
-                                                                    </StackPanel>
-                                                                </DataTemplate>
-                                                            </ComboBox.ItemTemplate>
-                                                        </ComboBox>
-                                                        <TextBlock Text="{Binding SelectedMod.InstalledVersion, StringFormat='Aktualnie zainstalowana wersja: {0}', FallbackValue='Aktualnie zainstalowana wersja: Brak'}" FontSize="11" Foreground="{DynamicResource SubTextColor}" Margin="0,6,0,0" />
-                                                    </StackPanel>
-                                                </Border>
-
-                                                <TextBlock Text="Informacje techniczne:" FontSize="13" FontWeight="Bold" Foreground="#E0E0E6" Margin="0,0,0,6" />
-                                                <Border Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="12">
-                                                    <StackPanel>
-                                                        <TextBlock Text="{Binding SelectedMod.RepoOwner, StringFormat='Repozytorium GitHub: {0}/'}" FontSize="12" Foreground="{DynamicResource SubTextColor}">
-                                                            <Run Text="{Binding SelectedMod.RepoName}" Foreground="#FFFFFF" FontWeight="Bold" />
-                                                        </TextBlock>
-                                                        <TextBlock Text="{Binding SelectedMod.TargetPluginFileName, StringFormat='Docelowy plik wtyczki BepInEx: {0}'}" FontSize="12" Foreground="{DynamicResource SubTextColor}" Margin="0,4,0,0" />
-                                                    </StackPanel>
-                                                </Border>
-                                            </StackPanel>
-                                        </ScrollViewer>
-
-                                        <!-- Prawa Kolumna: Changelog / Dziennik Zmian -->
-                                        <Grid Grid.Column="1" Margin="8,0,0,0">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="*" />
-                                            </Grid.RowDefinitions>
-
-                                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,6">
-                                                <TextBlock Text="📋 Dziennik zmian (Changelog):" FontSize="13" FontWeight="Bold" Foreground="#E0E0E6" />
-                                            </StackPanel>
-
-                                            <Border Grid.Row="1" Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="14">
-                                                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                                    <TextBlock Text="{Binding SelectedRelease.ReleaseNotes, TargetNullValue='Brak opisu zmian dla tego wydania.'}" FontSize="12" Foreground="#CBD5E1" TextWrapping="Wrap" LineHeight="18" />
-                                                </ScrollViewer>
-                                            </Border>
-                                        </Grid>
-                                    </Grid>
-
-                                    <!-- 3. Dolny Pasek Akcji (Brak zduplikowanego przycisku 'Zamknij') -->
-                                    <Border Grid.Row="2" Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="14,10">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-
-                                            <Button Grid.Column="0" Content="🗑 Odinstaluj modyfikację"
-                                                    Command="{Binding UninstallModCommand}" CommandParameter="{Binding SelectedMod}"
-                                                    Foreground="#FCA5A5" Background="#3A1C1C" Padding="14,8"
-                                                    IsEnabled="{Binding IsNotBusy}">
-                                                <Button.Style>
-                                                    <Style TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding SelectedMod.Status}" Value="Installed">
-                                                                <Setter Property="Visibility" Value="Visible" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Button.Style>
-                                            </Button>
-
-                                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0">
-                                                <TextBlock Text="Wybrana wersja: " FontSize="12" Foreground="{DynamicResource SubTextColor}" />
-                                                <TextBlock Text="{Binding SelectedRelease.VersionString, FallbackValue='Najnowsza'}" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" />
-                                            </StackPanel>
-
-                                            <Button Grid.Column="2" Content="⬇ Zainstaluj wybraną wersję" Style="{StaticResource PrimaryButtonStyle}"
-                                                    Command="{Binding InstallModCommand}" CommandParameter="{Binding SelectedMod}"
-                                                    IsEnabled="{Binding IsNotBusy}" Padding="18,8" />
-                                        </Grid>
-                                    </Border>
-                                </Grid>
-                            </Border>
-                        </Border>
                     </Grid>
+
+                    <!-- Pasek Paginacji (Row 3) -->
+                    <Border Grid.Row="3" Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="12,8" Margin="0,10,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" Content="◀ Poprzednia strona" Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding PreviousPageCommand}" IsEnabled="{Binding CanGoPrevious}"
+                                    HorizontalAlignment="Left" Padding="14,6" FontSize="12" />
+                            <TextBlock Grid.Column="1" Text="{Binding PageDisplayString}" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="#FFFFFF" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="20,0" />
+                            <Button Grid.Column="2" Content="Następna strona ▶" Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding NextPageCommand}" IsEnabled="{Binding CanGoNext}"
+                                    HorizontalAlignment="Right" Padding="14,6" FontSize="12" />
+                        </Grid>
+                    </Border>
                 </Grid>
             </Border>
 
@@ -1770,6 +1628,171 @@
                         <!-- Dalej / Zakończ -->
                         <Button Grid.Column="3" Content="Dalej ➔" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding NextTourStepCommand}" Padding="18,8" FontSize="12" />
                     </Grid>
+                </Grid>
+            </Border>
+        </Border>
+
+        <!-- ======================================================== -->
+        <!-- 5b. MODAL SZCZEGÓŁÓW MODA W STYLU STARLIGHT (ROOT GRID)  -->
+        <!-- ======================================================== -->
+        <Border Grid.RowSpan="5" Background="#E6070A10"
+                Visibility="{Binding ModBrowser.IsDetailsOpen, Converter={StaticResource BoolToVis}}"
+                Panel.ZIndex="300"
+                SnapsToDevicePixels="True">
+            <Border Background="{DynamicResource CardBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="12" Padding="24" MaxWidth="820" MaxHeight="620" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.RenderTransform>
+                    <TranslateTransform Y="0" />
+                </Border.RenderTransform>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" /> <!-- Header -->
+                        <RowDefinition Height="*" />    <!-- 2-Column Content -->
+                        <RowDefinition Height="Auto" /> <!-- Footer -->
+                    </Grid.RowDefinitions>
+
+                    <!-- 1. Header: Ikona, Nazwa, Autor, Kategoria oraz Przycisk GitHub i Zamknij [X] -->
+                    <Grid Grid.Row="0" Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Ikona Moda -->
+                        <Border Grid.Column="0" Width="56" Height="56" CornerRadius="10" Background="{DynamicResource CardBorder}" Margin="0,0,14,0" VerticalAlignment="Center">
+                            <Grid>
+                                <TextBlock Text="📦" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <Border CornerRadius="10">
+                                    <Border.Background>
+                                        <ImageBrush ImageSource="{Binding ModBrowser.SelectedMod.DisplayIcon}" Stretch="UniformToFill" />
+                                    </Border.Background>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <!-- Nazwa i Kategoria -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding ModBrowser.SelectedMod.Name}" FontSize="20" FontWeight="Bold" Foreground="#FFFFFF" />
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <Border Background="{DynamicResource HeaderBadgeBg}" CornerRadius="4" Padding="7,2" Margin="0,0,8,0">
+                                    <TextBlock Text="{Binding ModBrowser.SelectedMod.Category, StringFormat='Kategoria: {0}'}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource HeaderBadgeFg}" />
+                                </Border>
+                                <TextBlock Text="{Binding ModBrowser.SelectedMod.Author, StringFormat='Autor: {0}'}" FontSize="12" Foreground="{DynamicResource SubTextColor}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Przycisk GitHub oraz 'X' -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ModBrowser.OpenProjectPageCommand}" ToolTip="Otwórz repozytorium GitHub tego moda" Margin="0,0,10,0" Padding="10,6">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="🐙" Margin="0,0,6,0" FontSize="13" />
+                                    <TextBlock Text="Strona GitHub" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource CloseIconButtonStyle}" Command="{Binding ModBrowser.CloseDetailsCommand}" ToolTip="Zamknij podgląd" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 2. Treść Główna: 2 Kolumny (Lewa: Opis & Wersje, Prawa: Changelog) -->
+                    <Grid Grid.Row="1" Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.1*" />
+                            <ColumnDefinition Width="0.9*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Lewa Kolumna: Opis, Wybór Wersji i Info Techniczne -->
+                        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="0,0,8,0">
+                            <StackPanel>
+                                <TextBlock Text="O modyfikacji:" FontSize="13" FontWeight="Bold" Foreground="#E0E0E6" Margin="0,0,0,6" />
+                                <Border Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                                    <TextBlock Text="{Binding ModBrowser.SelectedMod.Description}" FontSize="12.5" Foreground="#CBD5E1" TextWrapping="Wrap" LineHeight="18" />
+                                </Border>
+
+                                <TextBlock Text="Wybór wersji do instalacji:" FontSize="13" FontWeight="Bold" Foreground="#E0E0E6" Margin="0,0,0,6" />
+                                <Border Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                                    <StackPanel>
+                                        <TextBlock Text="Dostępne wydania na GitHubie:" FontSize="11" Foreground="{DynamicResource SubTextColor}" Margin="0,0,0,6" />
+                                        <TextBlock Text="⏳ Pobieranie listy wydań..." FontSize="11" Foreground="{DynamicResource AccentColor}" Margin="0,0,0,4" Visibility="{Binding ModBrowser.IsLoadingReleases, Converter={StaticResource BoolToVis}}" />
+                                        <ComboBox ItemsSource="{Binding ModBrowser.AvailableReleases}" SelectedItem="{Binding ModBrowser.SelectedRelease}" Height="34" VerticalContentAlignment="Center" Margin="0,0,0,6">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding VersionString}" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,8,0" />
+                                                        <TextBlock Text="{Binding PublishedAt, StringFormat='({0:yyyy-MM-dd})'}" Foreground="#94A3B8" FontSize="11" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                        <TextBlock Text="{Binding ModBrowser.SelectedMod.InstalledVersion, StringFormat='Aktualnie zainstalowana wersja: {0}', FallbackValue='Aktualnie zainstalowana wersja: Brak'}" FontSize="11" Foreground="{DynamicResource SubTextColor}" Margin="0,6,0,0" />
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock Text="Informacje techniczne:" FontSize="13" FontWeight="Bold" Foreground="#E0E0E6" Margin="0,0,0,6" />
+                                <Border Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="12">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding ModBrowser.SelectedMod.RepoOwner, StringFormat='Repozytorium GitHub: {0}/'}" FontSize="12" Foreground="{DynamicResource SubTextColor}">
+                                            <Run Text="{Binding ModBrowser.SelectedMod.RepoName}" Foreground="#FFFFFF" FontWeight="Bold" />
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding ModBrowser.SelectedMod.TargetPluginFileName, StringFormat='Docelowy plik wtyczki BepInEx: {0}'}" FontSize="12" Foreground="{DynamicResource SubTextColor}" Margin="0,4,0,0" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!-- Prawa Kolumna: Changelog / Dziennik Zmian -->
+                        <Grid Grid.Column="1" Margin="8,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Text="📋 Dziennik zmian (Changelog):" FontSize="13" FontWeight="Bold" Foreground="#E0E0E6" />
+                            </StackPanel>
+
+                            <Border Grid.Row="1" Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="14">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <TextBlock Text="{Binding ModBrowser.SelectedRelease.ReleaseNotes, TargetNullValue='Brak opisu zmian dla tego wydania.'}" FontSize="12" Foreground="#CBD5E1" TextWrapping="Wrap" LineHeight="18" />
+                                </ScrollViewer>
+                            </Border>
+                        </Grid>
+                    </Grid>
+
+                    <!-- 3. Dolny Pasek Akcji (Brak zduplikowanego przycisku 'Zamknij') -->
+                    <Border Grid.Row="2" Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="14,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0" Content="🗑 Odinstaluj modyfikację"
+                                    Command="{Binding ModBrowser.UninstallModCommand}" CommandParameter="{Binding ModBrowser.SelectedMod}"
+                                    Foreground="#FCA5A5" Background="#3A1C1C" Padding="14,8"
+                                    IsEnabled="{Binding ModBrowser.IsNotBusy}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ModBrowser.SelectedMod.Status}" Value="Installed">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0">
+                                <TextBlock Text="Wybrana wersja: " FontSize="12" Foreground="{DynamicResource SubTextColor}" />
+                                <TextBlock Text="{Binding ModBrowser.SelectedRelease.VersionString, FallbackValue='Najnowsza'}" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" />
+                            </StackPanel>
+
+                            <Button Grid.Column="2" Content="⬇ Zainstaluj wybraną wersję" Style="{StaticResource PrimaryButtonStyle}"
+                                    Command="{Binding ModBrowser.InstallModCommand}" CommandParameter="{Binding ModBrowser.SelectedMod}"
+                                    IsEnabled="{Binding ModBrowser.IsNotBusy}" Padding="18,8" />
+                        </Grid>
+                    </Border>
                 </Grid>
             </Border>
         </Border>

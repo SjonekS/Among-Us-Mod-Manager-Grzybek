@@ -72,6 +72,27 @@ public partial class ModBrowserViewModel : ObservableObject
     [ObservableProperty]
     private bool _isDetailsOpen;
 
+    // ── Paginacja ──────────────────────────────────────────────────────
+    public ObservableCollection<ModCatalogItem> PagedMods { get; } = new();
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PageDisplayString))]
+    [NotifyPropertyChangedFor(nameof(CanGoPrevious))]
+    [NotifyPropertyChangedFor(nameof(CanGoNext))]
+    private int _currentPage = 1;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PageDisplayString))]
+    [NotifyPropertyChangedFor(nameof(CanGoPrevious))]
+    [NotifyPropertyChangedFor(nameof(CanGoNext))]
+    private int _totalPages = 1;
+
+    private const int PageSize = 6;
+
+    public bool CanGoPrevious => CurrentPage > 1;
+    public bool CanGoNext => CurrentPage < TotalPages;
+    public string PageDisplayString => $"Strona {CurrentPage} z {TotalPages}";
+
     [RelayCommand]
     private async Task SelectModAsync(ModCatalogItem? mod)
     {
@@ -169,6 +190,7 @@ public partial class ModBrowserViewModel : ObservableObject
         var items = _catalogService.GetCatalogItems();
         AllMods = new ObservableCollection<ModCatalogItem>(items);
         SelectedMod = AllMods.FirstOrDefault();
+        ApplyFilters();
 
         await RefreshModsStatusAsync();
     }
@@ -221,6 +243,45 @@ public partial class ModBrowserViewModel : ObservableObject
         }
 
         FilteredMods = new ObservableCollection<ModCatalogItem>(list);
+        CurrentPage = 1;
+        UpdatePagedMods();
+    }
+
+    private void UpdatePagedMods()
+    {
+        TotalPages = Math.Max(1, (int)Math.Ceiling((double)FilteredMods.Count / PageSize));
+        if (CurrentPage > TotalPages) CurrentPage = TotalPages;
+        if (CurrentPage < 1) CurrentPage = 1;
+
+        PagedMods.Clear();
+        foreach (var m in FilteredMods.Skip((CurrentPage - 1) * PageSize).Take(PageSize))
+        {
+            PagedMods.Add(m);
+        }
+
+        OnPropertyChanged(nameof(CanGoPrevious));
+        OnPropertyChanged(nameof(CanGoNext));
+        OnPropertyChanged(nameof(PageDisplayString));
+    }
+
+    [RelayCommand]
+    private void NextPage()
+    {
+        if (CanGoNext)
+        {
+            CurrentPage++;
+            UpdatePagedMods();
+        }
+    }
+
+    [RelayCommand]
+    private void PreviousPage()
+    {
+        if (CanGoPrevious)
+        {
+            CurrentPage--;
+            UpdatePagedMods();
+        }
     }
 
     [RelayCommand]

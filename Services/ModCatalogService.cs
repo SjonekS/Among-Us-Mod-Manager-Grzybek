@@ -32,6 +32,7 @@ public class ModCatalogService : IModCatalogService
     {
         return new List<ModCatalogItem>
         {
+            // === STRONA 1: Najważniejsze i Pakiety Bazowe ===
             new ModCatalogItem
             {
                 Id = "tou-mira",
@@ -62,6 +63,21 @@ public class ModCatalogService : IModCatalogService
             },
             new ModCatalogItem
             {
+                Id = "town-of-us-r",
+                Name = "Town Of Us: Reactivated",
+                Author = "eDonnes124",
+                Description = "Popularne rozszerzenie TownOfUs z nowymi rolami i mechanikami rozgrywki. Wersja reaktywowana przez społeczność.",
+                Category = "Role / AddOn",
+                RepoOwner = "eDonnes124",
+                RepoName = "Town-Of-Us-R",
+                AssetFileNameFilter = ".dll",
+                TargetPluginFileName = "TownOfUs.dll",
+                IsCore = false,
+                RequiresCore = true,
+                ProjectUrl = "https://github.com/eDonnes124/Town-Of-Us-R"
+            },
+            new ModCatalogItem
+            {
                 Id = "submerged",
                 Name = "Submerged (Nowa Mapa)",
                 Author = "Submerged Team",
@@ -74,21 +90,6 @@ public class ModCatalogService : IModCatalogService
                 IsCore = false,
                 RequiresCore = true,
                 ProjectUrl = "https://github.com/SubmergedAmongUs/Submerged"
-            },
-            new ModCatalogItem
-            {
-                Id = "better-polus",
-                Name = "BetterPolus (Ulepszenia Mapy)",
-                Author = "Galster-dev",
-                Description = "Znaczące usprawnienia balansu i oprawione oświetlenie dla klasycznej mapy Polus.",
-                Category = "Ulepszenia",
-                RepoOwner = "Galster-dev",
-                RepoName = "BetterPolus",
-                AssetFileNameFilter = ".dll",
-                TargetPluginFileName = "BetterPolus.dll",
-                IsCore = false,
-                RequiresCore = true,
-                ProjectUrl = "https://github.com/Galster-dev/BetterPolus"
             },
             new ModCatalogItem
             {
@@ -105,6 +106,145 @@ public class ModCatalogService : IModCatalogService
                 RequiresCore = true,
                 ProjectUrl = "https://github.com/DigiWorm0/LevelImposter",
                 IconUrl = "https://levelimposter.net/favicon.ico"
+            },
+            new ModCatalogItem
+            {
+                Id = "lotus-continued",
+                Name = "Lotus Continued",
+                Author = "Lotus-AU",
+                Description = "Kontynuacja projektu Lotus – bogaty zbiór ról, zadań i mechanik stworzony przez społeczność Among Us.",
+                Category = "Role / AddOn",
+                RepoOwner = "Lotus-AU",
+                RepoName = "LotusContinued",
+                AssetFileNameFilter = ".dll",
+                TargetPluginFileName = "ProjectLotus.dll",
+                IsCore = false,
+                RequiresCore = true,
+                ProjectUrl = "https://github.com/Lotus-AU/LotusContinued"
+            },
+
+            // === STRONA 2: Rozgrywka, Personalizacja i Narzędzia ===
+            new ModCatalogItem
+            {
+                Id = "wilder-draft",
+                Name = "Wilder Draft",
+                Author = "WanderingPix",
+                Description = "Mod dodający tryb draftu ról – przed każdą grą gracze losują i wybierają swoje role.",
+                Category = "Rozgrywka",
+                RepoOwner = "WanderingPix",
+                RepoName = "Wilder-Draft",
+                AssetFileNameFilter = ".dll",
+                TargetPluginFileName = "WilderDraft.dll",
+                IsCore = false,
+                RequiresCore = true,
+                ProjectUrl = "https://github.com/WanderingPix/Wilder-Draft"
+            },
+            new ModCatalogItem
+            {
+                Id = "colors-of-joy",
+                Name = "Colors Of Joy",
+                Author = "WanderingPix",
+                Description = "Rozszerza paletę kolorów postaci w Among Us o nowe, unikalne barwy.",
+                Category = "Kosmetyki",
+                RepoOwner = "WanderingPix",
+                RepoName = "Colors-Of-Joy",
+                AssetFileNameFilter = ".dll",
+                TargetPluginFileName = "ColorsOfJoy.dll",
+                IsCore = false,
+                RequiresCore = true,
+                ProjectUrl = "https://github.com/WanderingPix/Colors-Of-Joy"
+            },
+            new ModCatalogItem
+            {
+                Id = "stargazer",
+                Name = "Stargazer",
+                Author = "Reach-For-Stars-Team",
+                Description = "Mod dodający nowe role astronomiczne i kosmiczne mechaniki do Among Us.",
+                Category = "Role / AddOn",
+                RepoOwner = "Reach-For-Stars-Team",
+                RepoName = "Stargazer",
+                AssetFileNameFilter = ".dll",
+                TargetPluginFileName = "Stargazer.dll",
+                IsCore = false,
+                RequiresCore = true,
+                ProjectUrl = "https://github.com/Reach-For-Stars-Team/Stargazer"
+            },
+            new ModCatalogItem
+            {
+                Id = "crewmeleon",
+                Name = "Crewmeleon",
+                Author = "OBit508",
+                Description = "Mod dodający nową rolę Kameleona zmieniającego kolor, ukrywającego się wśród załogi.",
+                Category = "Role / AddOn",
+                RepoOwner = "OBit508",
+                RepoName = "Crewmeleon",
+                AssetFileNameFilter = ".dll",
+                TargetPluginFileName = "Crewmeleon.dll",
+                IsCore = false,
+                RequiresCore = true,
+                ProjectUrl = "https://github.com/OBit508/Crewmeleon"
+            },
+            new ModCatalogItem
+            {
+                Id = "crewmeleon-redrawn",
+                Name = "Crewmeleon Redrawn",
+                Author = "All-Of-Us-Mods",
+                Description = "Przeprojektowana wersja Crewmeleon z ulepszonym balansem i nowymi umiejętnościami.",
+                Category = "Role / AddOn",
+                RepoOwner = "All-Of-Us-Mods",
+                RepoName = "Crewmeleon-Redrawn",
+                AssetFileNameFilter = ".dll",
+                TargetPluginFileName = "CrewmeleonRedrawn.dll",
+                IsCore = false,
+                RequiresCore = true,
+                ProjectUrl = "https://github.com/All-Of-Us-Mods/Crewmeleon-Redrawn"
+            },
+            new ModCatalogItem
+            {
+                Id = "host-utility",
+                Name = "Host Utility",
+                Author = "WanderingPix",
+                Description = "Narzędzia dla hosta gry – ulepszony panel ustawień, szybkie komendy i zarządzanie lobby.",
+                Category = "Narzędzia",
+                RepoOwner = "WanderingPix",
+                RepoName = "Host-Utility",
+                AssetFileNameFilter = ".dll",
+                TargetPluginFileName = "HostUtility.dll",
+                IsCore = false,
+                RequiresCore = true,
+                ProjectUrl = "https://github.com/WanderingPix/Host-Utility"
+            },
+
+            // === STRONA 3: Dodatkowe Modyfikacje i Addony ===
+            new ModCatalogItem
+            {
+                Id = "emojis-in-mogus-chat",
+                Name = "Emojis in mogus chat",
+                Author = "WanderingPix",
+                Description = "Dodaje obsługę emoji do czatu w Among Us – wyrażaj emocje podczas gry!",
+                Category = "Narzędzia",
+                RepoOwner = "WanderingPix",
+                RepoName = "Emojis-in-the-mogus-chat",
+                AssetFileNameFilter = ".dll",
+                TargetPluginFileName = "EmojisMod.dll",
+                IsCore = false,
+                RequiresCore = true,
+                ProjectUrl = "https://github.com/WanderingPix/Emojis-in-the-mogus-chat"
+            },
+            new ModCatalogItem
+            {
+                Id = "achievements-api",
+                Name = "AchievementsAPI",
+                Author = "am-clonec",
+                Description = "Framework osiągnięć dla Among Us – pozwala modom dodawać własne osiągnięcia i wyzwania.",
+                Category = "Narzędzia",
+                RepoOwner = "am-clonec",
+                RepoName = "AchievementsAPI",
+                AssetFileNameFilter = ".dll",
+                TargetPluginFileName = "AchievementsAPI.dll",
+                IsCore = false,
+                RequiresCore = true,
+                ProjectUrl = "https://github.com/am-clonec/AchievementsAPI"
             },
             new ModCatalogItem
             {
