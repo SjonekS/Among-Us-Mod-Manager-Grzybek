@@ -242,6 +242,7 @@ public class ModInstallerService : IModInstallerService
                 Major = package.Version.Major,
                 Minor = package.Version.Minor,
                 Patch = package.Version.Build >= 0 ? package.Version.Build : 0,
+                Revision = package.Version.Revision >= 0 ? package.Version.Revision : 0,
                 Architecture = package.Architecture,
                 Variant = package.Variant,
                 InstalledAt = DateTimeOffset.Now

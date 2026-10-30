@@ -10,7 +10,7 @@ public record PackageParseResult(bool IsSuccess, string? ErrorMessage, ModPackag
 public static partial class ModPackageParser
 {
     // Flexible version regex matching vX.Y.Z anywhere in string (e.g. "v1.7.3")
-    [GeneratedRegex(@"v(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"v?(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?:\.(?<build>\d+))?", RegexOptions.IgnoreCase)]
     private static partial Regex VersionPattern();
 
     [GeneratedRegex(@"(?<arch>x86|x64)", RegexOptions.IgnoreCase)]
@@ -101,8 +101,18 @@ public static partial class ModPackageParser
         int major = int.Parse(versionMatch.Groups["major"].Value);
         int minor = int.Parse(versionMatch.Groups["minor"].Value);
         int patch = int.Parse(versionMatch.Groups["patch"].Value);
-        var version = new Version(major, minor, patch);
-        var rawVersion = $"v{major}.{minor}.{patch}";
+        Version version;
+        string rawVersion;
+        if (versionMatch.Groups["build"].Success && int.TryParse(versionMatch.Groups["build"].Value, out int build))
+        {
+            version = new Version(major, minor, patch, build);
+            rawVersion = $"v{major}.{minor}.{patch}.{build}";
+        }
+        else
+        {
+            version = new Version(major, minor, patch);
+            rawVersion = $"v{major}.{minor}.{patch}";
+        }
 
         // Architecture detection (default x86)
         var archMatch = ArchPattern().Match(fileName);

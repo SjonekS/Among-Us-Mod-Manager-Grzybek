@@ -32,7 +32,7 @@ public partial class GitHubReleaseService : IGitHubReleaseService
         DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower
     };
 
-    [GeneratedRegex(@"v?(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"v?(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?:\.(?<build>\d+))?", RegexOptions.IgnoreCase)]
     private static partial Regex VersionRegex();
 
     [GeneratedRegex(@"href=""(/[^""]+/releases/download/[^""]+TouMira[^""]+\.zip)""", RegexOptions.IgnoreCase)]
@@ -373,8 +373,18 @@ public partial class GitHubReleaseService : IGitHubReleaseService
         int major = int.Parse(match.Groups["major"].Value);
         int minor = int.Parse(match.Groups["minor"].Value);
         int patch = int.Parse(match.Groups["patch"].Value);
-        var version = new Version(major, minor, patch);
-        var rawVersion = $"v{major}.{minor}.{patch}";
+        Version version;
+        string rawVersion;
+        if (match.Groups["build"].Success && int.TryParse(match.Groups["build"].Value, out int build))
+        {
+            version = new Version(major, minor, patch, build);
+            rawVersion = $"v{major}.{minor}.{patch}.{build}";
+        }
+        else
+        {
+            version = new Version(major, minor, patch);
+            rawVersion = $"v{major}.{minor}.{patch}";
+        }
 
         return (version, rawVersion);
     }
