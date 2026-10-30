@@ -1,0 +1,33 @@
+## Build & Output Folders
+bin/
+obj/
+publish/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Temporary / Cache Files
+.vs/
+.idea/
+.vscode/
+*.log
+*.tmp
+*.bak
+*.swp
+
+## App Runtime & User Data
+backups/
+manager-data/
+temp/
+logs/
+*.zip
+*.rar
+*.7z
+
+## OS Generated
+[Tt]humbs.db
+[Ee]xprints
+[Dd]esktop.ini
+$RECYCLE.BIN/
+.DS_Store
