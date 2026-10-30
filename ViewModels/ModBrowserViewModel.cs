@@ -163,36 +163,43 @@ public partial class ModBrowserViewModel : ObservableObject
 
     private async void LoadInitialData()
     {
-        // 1. Załaduj listę środowisk (Steam + Kapsuły)
-        var steamPath = _modInstaller.ResolveGamePath() ?? "";
-        AvailableTargets.Clear();
-        AvailableTargets.Add(new TargetEnvironmentItem
+        try
         {
-            Name = "🎮 Główna gra (Steam)",
-            Path = steamPath,
-            IsInstance = false
-        });
-
-        var instances = await _instanceManager.GetAllInstancesAsync();
-        foreach (var inst in instances)
-        {
+            // 1. Załaduj listę środowisk (Steam + Kapsuły)
+            var steamPath = _modInstaller.ResolveGamePath() ?? "";
+            AvailableTargets.Clear();
             AvailableTargets.Add(new TargetEnvironmentItem
             {
-                Name = $"📦 Instancja: {inst.Name}",
-                Path = inst.Path,
-                IsInstance = true
+                Name = "🎮 Główna gra (Steam)",
+                Path = steamPath,
+                IsInstance = false
             });
+
+            var instances = await _instanceManager.GetAllInstancesAsync();
+            foreach (var inst in instances)
+            {
+                AvailableTargets.Add(new TargetEnvironmentItem
+                {
+                    Name = $"📦 Instancja: {inst.Name}",
+                    Path = inst.Path,
+                    IsInstance = true
+                });
+            }
+
+            SelectedTarget = AvailableTargets.FirstOrDefault();
+
+            // 2. Załaduj katalog modów
+            var items = _catalogService.GetCatalogItems();
+            AllMods = new ObservableCollection<ModCatalogItem>(items);
+            SelectedMod = AllMods.FirstOrDefault();
+            ApplyFilters();
+
+            await RefreshModsStatusAsync();
         }
-
-        SelectedTarget = AvailableTargets.FirstOrDefault();
-
-        // 2. Załaduj katalog modów
-        var items = _catalogService.GetCatalogItems();
-        AllMods = new ObservableCollection<ModCatalogItem>(items);
-        SelectedMod = AllMods.FirstOrDefault();
-        ApplyFilters();
-
-        await RefreshModsStatusAsync();
+        catch (Exception ex)
+        {
+            StatusMessage = $"Błąd inicjalizacji przeglądarki: {ex.Message}";
+        }
     }
 
     partial void OnSelectedTargetChanged(TargetEnvironmentItem? value)
