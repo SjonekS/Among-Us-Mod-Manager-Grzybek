@@ -166,6 +166,19 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private string _launcherUpdateStatus = "";
+    [RelayCommand]
+    private void OpenGitHubRepo()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = $"https://github.com/{LauncherRepoOwner}/{LauncherRepoName}",
+                UseShellExecute = true
+            });
+        }
+        catch { }
+    }
 
     [RelayCommand]
     public void StartTour()

@@ -12,8 +12,8 @@ namespace AmongUsModManager.Services;
 
 public partial class GitHubReleaseService : IGitHubReleaseService
 {
-    private const string RepoOwner = "SjonekS";
-    private const string RepoName = "Miasto-Nasze-Mody";
+    private const string RepoOwner = "AU-Avengers";
+    private const string RepoName = "TOU-Mira";
     private const string GitHubApiLatestReleaseUrl = $"https://api.github.com/repos/{RepoOwner}/{RepoName}/releases/latest";
     private const string GitHubWebLatestReleaseUrl = $"https://github.com/{RepoOwner}/{RepoName}/releases/latest";
 
@@ -40,7 +40,7 @@ public partial class GitHubReleaseService : IGitHubReleaseService
 
     public Task<GitHubReleaseInfo?> GetLatestTouMiraReleaseAsync(Action<string>? logCallback = null, CancellationToken ct = default)
     {
-        return GetLatestReleaseForRepoAsync(RepoOwner, RepoName, "TouMira", logCallback, ct);
+        return GetLatestReleaseForRepoAsync(RepoOwner, RepoName, ".zip", logCallback, ct);
     }
 
     public async Task<GitHubReleaseInfo?> GetLatestReleaseForRepoAsync(string owner, string repo, string? assetFilter = null, Action<string>? logCallback = null, CancellationToken ct = default)
@@ -166,6 +166,76 @@ public partial class GitHubReleaseService : IGitHubReleaseService
         }
 
         return null;
+    }
+
+    public async Task<List<GitHubReleaseInfo>> GetReleasesListForRepoAsync(string owner, string repo, string? assetFilter = null, Action<string>? logCallback = null, CancellationToken ct = default)
+    {
+        var result = new List<GitHubReleaseInfo>();
+        var apiUrl = $"https://api.github.com/repos/{owner}/{repo}/releases?per_page=15";
+
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
+            request.Headers.UserAgent.Add(new ProductInfoHeaderValue("AmongUsModManager", "3.0"));
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
+
+            using var response = await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+            if (response.IsSuccessStatusCode)
+            {
+                using var stream = await response.Content.ReadAsStreamAsync(ct);
+                using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
+                if (doc.RootElement.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var root in doc.RootElement.EnumerateArray())
+                    {
+                        var tagName = root.TryGetProperty("tag_name", out var tagElem) ? tagElem.GetString() ?? "" : "";
+                        var bodyText = root.TryGetProperty("body", out var bodyElem) ? bodyElem.GetString() ?? "" : "";
+                        DateTimeOffset? publishedAt = null;
+                        if (root.TryGetProperty("published_at", out var pubElem) && DateTimeOffset.TryParse(pubElem.GetString(), out var dt))
+                        {
+                            publishedAt = dt;
+                        }
+
+                        if (root.TryGetProperty("assets", out var assetsElem) && assetsElem.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var asset in assetsElem.EnumerateArray())
+                            {
+                                var name = asset.TryGetProperty("name", out var n) ? n.GetString() ?? "" : "";
+                                var url = asset.TryGetProperty("browser_download_url", out var u) ? u.GetString() ?? "" : "";
+                                long size = asset.TryGetProperty("size", out var s) && s.ValueKind == JsonValueKind.Number ? s.GetInt64() : 0;
+
+                                bool matches = string.IsNullOrEmpty(assetFilter) || name.Contains(assetFilter, StringComparison.OrdinalIgnoreCase);
+                                if (matches && !string.IsNullOrEmpty(url))
+                                {
+                                    var ver = ParseSemanticVersion(tagName, name);
+                                    string versionStr = ver.HasValue ? ver.Value.RawVersionString : tagName;
+                                    Version versionObj = ver.HasValue ? ver.Value.Version : new Version(1, 0, 0);
+
+                                    result.Add(new GitHubReleaseInfo
+                                    {
+                                        TagName = tagName,
+                                        Version = versionObj,
+                                        VersionString = versionStr,
+                                        AssetName = name,
+                                        DownloadUrl = url,
+                                        SizeBytes = size,
+                                        PublishedAt = publishedAt,
+                                        ReleaseNotes = bodyText
+                                    });
+                                    break; // Jedno pasujące wydanie na release
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logCallback?.Invoke($"Błąd pobierania listy wydań {owner}/{repo}: {ex.Message}");
+        }
+
+        return result;
     }
 
     private async Task<GitHubReleaseInfo?> LegacyGetTouMiraReleaseAsync(Action<string>? logCallback = null, CancellationToken ct = default)

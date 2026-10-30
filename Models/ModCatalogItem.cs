@@ -27,15 +27,25 @@ public class ModCatalogItem
     public string? IconUrl { get; set; }
 
     /// <summary>
-    /// Zwraca zdefiniowaną ikonę lub domyślny avatar z repozytorium GitHub autora
+    /// Zwraca zdefiniowaną ikonę lub ikonę projektu / avatara
     /// </summary>
-    public string DisplayIcon => !string.IsNullOrEmpty(IconUrl)
-        ? IconUrl
-        : (!string.IsNullOrEmpty(RepoOwner) ? $"https://github.com/{RepoOwner}.png?size=128" : "");
+    public string DisplayIcon
+    {
+        get
+        {
+            if (!string.IsNullOrEmpty(IconUrl)) return IconUrl;
+            if (!string.IsNullOrEmpty(RepoOwner) && !string.IsNullOrEmpty(RepoName))
+            {
+                return $"https://raw.githubusercontent.com/{RepoOwner}/{RepoName}/main/Resources/icon.png";
+            }
+            return !string.IsNullOrEmpty(RepoOwner) ? $"https://github.com/{RepoOwner}.png?size=128" : "";
+        }
+    }
 
     // Stan runtime dla wybranej instancji
     public string? InstalledVersion { get; set; }
     public string? LatestRemoteVersion { get; set; }
     public ModInstallationStatus Status { get; set; } = ModInstallationStatus.NotInstalled;
     public GitHubReleaseInfo? LatestRelease { get; set; }
+    public List<GitHubReleaseInfo> AvailableReleases { get; set; } = new();
 }

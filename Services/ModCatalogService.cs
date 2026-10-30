@@ -35,16 +35,17 @@ public class ModCatalogService : IModCatalogService
             new ModCatalogItem
             {
                 Id = "tou-mira",
-                Name = "TouMira Core Pack",
-                Author = "Miasto Nasze / MiraAPI Team",
+                Name = "Town Of Us: Mira (Core Pack)",
+                Author = "AU-Avengers / MiraAPI Team",
                 Description = "Wymagany pakiet bazowy dla Among Us: zawiera framework BepInEx, Reactor oraz bibliotekę MiraAPI. Niezbędny do działania pozostałych modyfikacji.",
                 Category = "Pakiet Bazowy",
-                RepoOwner = "SjonekS",
-                RepoName = "Miasto-Nasze-Mody",
-                AssetFileNameFilter = "TouMira",
+                RepoOwner = "AU-Avengers",
+                RepoName = "TOU-Mira",
+                AssetFileNameFilter = ".zip",
                 IsCore = true,
                 RequiresCore = false,
-                ProjectUrl = "https://github.com/SjonekS/Miasto-Nasze-Mody"
+                ProjectUrl = "https://github.com/AU-Avengers/TOU-Mira",
+                IconUrl = "https://raw.githubusercontent.com/AU-Avengers/TOU-Mira/main/icon.png"
             },
             new ModCatalogItem
             {
@@ -59,7 +60,8 @@ public class ModCatalogService : IModCatalogService
                 TargetPluginFileName = "Submerged.dll",
                 IsCore = false,
                 RequiresCore = true,
-                ProjectUrl = "https://github.com/SubmergedAmongUs/Submerged"
+                ProjectUrl = "https://github.com/SubmergedAmongUs/Submerged",
+                IconUrl = "https://raw.githubusercontent.com/SubmergedAmongUs/Submerged/main/Submerged/Resources/SubmergedIcon.png"
             },
             new ModCatalogItem
             {
@@ -89,7 +91,8 @@ public class ModCatalogService : IModCatalogService
                 TargetPluginFileName = "LevelImposter.dll",
                 IsCore = false,
                 RequiresCore = true,
-                ProjectUrl = "https://github.com/DigiWorm0/LevelImposter"
+                ProjectUrl = "https://github.com/DigiWorm0/LevelImposter",
+                IconUrl = "https://levelimposter.net/favicon.ico"
             },
             new ModCatalogItem
             {
@@ -311,14 +314,15 @@ public class ModCatalogService : IModCatalogService
         ModCatalogItem item, 
         IProgress<OperationProgress>? progress = null, 
         Action<string>? log = null, 
-        CancellationToken ct = default)
+        CancellationToken ct = default,
+        GitHubReleaseInfo? customRelease = null)
     {
         if (string.IsNullOrWhiteSpace(gamePath) || !Directory.Exists(gamePath))
             throw new InvalidOperationException("Nieprawidłowy folder docelowy gry.");
 
         // 1. Pobierz Release info
-        progress?.Report(new OperationProgress(10, $"Wyszukiwanie najnowszego wydania {item.Name}..."));
-        var release = await _gitHubService.GetLatestReleaseForRepoAsync(item.RepoOwner, item.RepoName, item.AssetFileNameFilter, log, ct);
+        progress?.Report(new OperationProgress(10, $"Wyszukiwanie wydania {item.Name}..."));
+        var release = customRelease ?? await _gitHubService.GetLatestReleaseForRepoAsync(item.RepoOwner, item.RepoName, item.AssetFileNameFilter, log, ct);
         if (release == null)
         {
             throw new InvalidOperationException($"Nie udało się pobrać informacji o wydaniu dla {item.Name} z GitHub ({item.RepoOwner}/{item.RepoName}).");

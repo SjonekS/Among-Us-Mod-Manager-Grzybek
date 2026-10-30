@@ -22,6 +22,7 @@ public partial class ModBrowserViewModel : ObservableObject
     private readonly IInstanceManagerService _instanceManager;
     private readonly IModInstallerService _modInstaller;
     private readonly IProcessChecker _processChecker;
+    private readonly IGitHubReleaseService _gitHubService;
 
     [ObservableProperty]
     private ObservableCollection<TargetEnvironmentItem> _availableTargets = new();
@@ -37,6 +38,15 @@ public partial class ModBrowserViewModel : ObservableObject
 
     [ObservableProperty]
     private ModCatalogItem? _selectedMod;
+
+    [ObservableProperty]
+    private ObservableCollection<GitHubReleaseInfo> _availableReleases = new();
+
+    [ObservableProperty]
+    private GitHubReleaseInfo? _selectedRelease;
+
+    [ObservableProperty]
+    private bool _isLoadingReleases;
 
     [ObservableProperty]
     private string _searchQuery = "";
@@ -63,12 +73,48 @@ public partial class ModBrowserViewModel : ObservableObject
     private bool _isDetailsOpen;
 
     [RelayCommand]
-    private void SelectMod(ModCatalogItem? mod)
+    private async Task SelectModAsync(ModCatalogItem? mod)
     {
         if (mod != null)
         {
             SelectedMod = mod;
             IsDetailsOpen = true;
+            await LoadReleasesForSelectedModAsync();
+        }
+    }
+
+    private async Task LoadReleasesForSelectedModAsync()
+    {
+        if (SelectedMod == null) return;
+        AvailableReleases.Clear();
+        SelectedRelease = null;
+        IsLoadingReleases = true;
+
+        try
+        {
+            var releases = await _gitHubService.GetReleasesListForRepoAsync(
+                SelectedMod.RepoOwner, 
+                SelectedMod.RepoName, 
+                SelectedMod.AssetFileNameFilter);
+
+            foreach (var rel in releases)
+            {
+                AvailableReleases.Add(rel);
+            }
+
+            SelectedRelease = AvailableReleases.FirstOrDefault() ?? SelectedMod.LatestRelease;
+        }
+        catch
+        {
+            if (SelectedMod.LatestRelease != null)
+            {
+                AvailableReleases.Add(SelectedMod.LatestRelease);
+                SelectedRelease = SelectedMod.LatestRelease;
+            }
+        }
+        finally
+        {
+            IsLoadingReleases = false;
         }
     }
 
@@ -82,12 +128,14 @@ public partial class ModBrowserViewModel : ObservableObject
         IModCatalogService catalogService,
         IInstanceManagerService instanceManager,
         IModInstallerService modInstaller,
-        IProcessChecker processChecker)
+        IProcessChecker processChecker,
+        IGitHubReleaseService gitHubService)
     {
         _catalogService = catalogService;
         _instanceManager = instanceManager;
         _modInstaller = modInstaller;
         _processChecker = processChecker;
+        _gitHubService = gitHubService;
 
         LoadInitialData();
     }
@@ -206,8 +254,11 @@ public partial class ModBrowserViewModel : ObservableObject
             return;
         }
 
+        var chosenRelease = (target == SelectedMod) ? SelectedRelease : null;
+        var versionLabel = chosenRelease != null ? chosenRelease.VersionString : target.LatestRemoteVersion;
+
         IsBusy = true;
-        StatusMessage = $"Pobieranie i instalacja {target.Name}...";
+        StatusMessage = $"Pobieranie i instalacja {target.Name} ({versionLabel})...";
         ProgressPercentage = 0;
 
         try
@@ -218,10 +269,10 @@ public partial class ModBrowserViewModel : ObservableObject
                 StatusMessage = p.Status;
             });
 
-            await _catalogService.InstallModAsync(SelectedTarget.Path, target, prog);
+            await _catalogService.InstallModAsync(SelectedTarget.Path, target, prog, null, default, chosenRelease);
             await RefreshModsStatusAsync();
 
-            MessageBox.Show($"Pomyślnie zainstalowano {target.Name} w {SelectedTarget.Name}!", "Instalacja zakończona", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show($"Pomyślnie zainstalowano {target.Name} ({versionLabel}) w {SelectedTarget.Name}!", "Instalacja zakończona", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
