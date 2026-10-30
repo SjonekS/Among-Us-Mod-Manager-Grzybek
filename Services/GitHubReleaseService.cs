@@ -12,8 +12,8 @@ namespace AmongUsModManager.Services;
 
 public partial class GitHubReleaseService : IGitHubReleaseService
 {
-    private const string RepoOwner = "AU-Avengers";
-    private const string RepoName = "TOU-Mira";
+    private const string RepoOwner = "SjonekS";
+    private const string RepoName = "Miasto-Nasze-Mody";
     private const string GitHubApiLatestReleaseUrl = $"https://api.github.com/repos/{RepoOwner}/{RepoName}/releases/latest";
     private const string GitHubWebLatestReleaseUrl = $"https://github.com/{RepoOwner}/{RepoName}/releases/latest";
 

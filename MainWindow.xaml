@@ -128,15 +128,57 @@
 
         <!-- Dark ComboBox ToggleButton -->
         <ControlTemplate x:Key="ComboBoxToggleButtonTemplate" TargetType="ToggleButton">
-            <Border Background="{DynamicResource InputBackground}" 
+            <Border x:Name="ToggleBorder"
+                    Background="{DynamicResource InputBackground}" 
                     BorderBrush="{DynamicResource CardBorder}" 
                     BorderThickness="1" 
                     CornerRadius="6">
                 <Border Background="Transparent" HorizontalAlignment="Right" Width="28">
-                    <Path Data="M 0 0 L 4 4 L 8 0 Z" Fill="{DynamicResource SubTextColor}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Path x:Name="Arrow" Data="M 0 0 L 4 4 L 8 0 Z" Fill="{DynamicResource SubTextColor}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>
             </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="{DynamicResource AccentHover}" />
+                    <Setter TargetName="Arrow" Property="Fill" Value="#FFFFFF" />
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="{DynamicResource AccentColor}" />
+                    <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource AccentColor}" />
+                </Trigger>
+            </ControlTemplate.Triggers>
         </ControlTemplate>
+
+        <!-- Global Dark ComboBoxItem Style (Ciemne tło, wyraźny czytelny tekst, fioletowy akcent zaznaczenia) -->
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#CBD5E1" />
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="ItemBorder" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" CornerRadius="5" Margin="2,1">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#252D3F" />
+                                <Setter Property="Foreground" Value="#FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#321D59" />
+                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource AccentColor}" />
+                                <Setter TargetName="ItemBorder" Property="BorderThickness" Value="1" />
+                                <Setter Property="Foreground" Value="#FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
         <!-- Dark ComboBox Style (Elegancki, ciemny styl bez białych elementów systemu) -->
         <Style x:Key="DarkComboBoxStyle" TargetType="ComboBox">
@@ -144,6 +186,7 @@
             <Setter Property="Foreground" Value="#FFFFFF" />
             <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}" />
             <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="MaxDropDownHeight" Value="240" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
             <Setter Property="OverridesDefaultStyle" Value="True" />
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
@@ -163,7 +206,7 @@
                                               Content="{TemplateBinding SelectionBoxItem}" 
                                               ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" 
                                               ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" 
-                                              Margin="12,8,30,8" 
+                                              Margin="12,6,30,6" 
                                               VerticalAlignment="Center" 
                                               HorizontalAlignment="Left" />
                             <Popup Name="Popup" 
@@ -180,8 +223,9 @@
                                             BorderBrush="{DynamicResource CardBorder}" 
                                             BorderThickness="1" 
                                             CornerRadius="6" 
-                                            Margin="0,4,0,0">
-                                        <ScrollViewer Margin="4" SnapsToDevicePixels="True">
+                                            Margin="0,4,0,0"
+                                            Padding="3">
+                                        <ScrollViewer Margin="2" SnapsToDevicePixels="True">
                                             <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
                                         </ScrollViewer>
                                     </Border>
@@ -192,6 +236,9 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Globalny Domyślny Styl ComboBox w Całej Aplikacji -->
+        <Style TargetType="ComboBox" BasedOn="{StaticResource DarkComboBoxStyle}" />
 
         <!-- Toggle Switch Style (Nowoczesny suwak ON/OFF) -->
         <Style x:Key="ToggleSwitchStyle" TargetType="CheckBox">
@@ -1259,7 +1306,7 @@
                                                     <StackPanel>
                                                         <TextBlock Text="Dostępne wydania na GitHubie:" FontSize="11" Foreground="{DynamicResource SubTextColor}" Margin="0,0,0,6" />
                                                         <TextBlock Text="⏳ Pobieranie listy wydań..." FontSize="11" Foreground="{DynamicResource AccentColor}" Margin="0,0,0,4" Visibility="{Binding IsLoadingReleases, Converter={StaticResource BoolToVis}}" />
-                                                        <ComboBox ItemsSource="{Binding AvailableReleases}" SelectedItem="{Binding SelectedRelease}" Height="32" VerticalContentAlignment="Center" Background="#1E2337" Foreground="#FFFFFF" BorderBrush="{DynamicResource CardBorder}">
+                                                        <ComboBox ItemsSource="{Binding AvailableReleases}" SelectedItem="{Binding SelectedRelease}" Height="34" VerticalContentAlignment="Center" Margin="0,0,0,6">
                                                             <ComboBox.ItemTemplate>
                                                                 <DataTemplate>
                                                                     <StackPanel Orientation="Horizontal">

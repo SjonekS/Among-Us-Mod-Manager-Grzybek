@@ -35,17 +35,30 @@ public class ModCatalogService : IModCatalogService
             new ModCatalogItem
             {
                 Id = "tou-mira",
-                Name = "Town Of Us: Mira (Core Pack)",
+                Name = "TouMira (Wydanie Serwera / Grzybek)",
+                Author = "SjonekS / Miasto Nasze",
+                Description = "Zgodny z naszym serwerem i instalacją pakiet bazowy TouMira (framework BepInEx, Reactor, MiraAPI). Rekomendowany do wspólnej gry.",
+                Category = "Pakiet Bazowy",
+                RepoOwner = "SjonekS",
+                RepoName = "Miasto-Nasze-Mody",
+                AssetFileNameFilter = "TouMira",
+                IsCore = true,
+                RequiresCore = false,
+                ProjectUrl = "https://github.com/SjonekS/Miasto-Nasze-Mody"
+            },
+            new ModCatalogItem
+            {
+                Id = "tou-mira-official",
+                Name = "Town Of Us: Mira (Oficjalny AU-Avengers)",
                 Author = "AU-Avengers / MiraAPI Team",
-                Description = "Wymagany pakiet bazowy dla Among Us: zawiera framework BepInEx, Reactor oraz bibliotekę MiraAPI. Niezbędny do działania pozostałych modyfikacji.",
+                Description = "Oficjalne, najnowsze wydanie pakietu TouMira od twórców modyfikacji. Uwaga: może wymagać innej wersji gry Among Us niż nasz serwer.",
                 Category = "Pakiet Bazowy",
                 RepoOwner = "AU-Avengers",
                 RepoName = "TOU-Mira",
                 AssetFileNameFilter = ".zip",
                 IsCore = true,
                 RequiresCore = false,
-                ProjectUrl = "https://github.com/AU-Avengers/TOU-Mira",
-                IconUrl = "https://raw.githubusercontent.com/AU-Avengers/TOU-Mira/main/icon.png"
+                ProjectUrl = "https://github.com/AU-Avengers/TOU-Mira"
             },
             new ModCatalogItem
             {
@@ -60,8 +73,7 @@ public class ModCatalogService : IModCatalogService
                 TargetPluginFileName = "Submerged.dll",
                 IsCore = false,
                 RequiresCore = true,
-                ProjectUrl = "https://github.com/SubmergedAmongUs/Submerged",
-                IconUrl = "https://raw.githubusercontent.com/SubmergedAmongUs/Submerged/main/Submerged/Resources/SubmergedIcon.png"
+                ProjectUrl = "https://github.com/SubmergedAmongUs/Submerged"
             },
             new ModCatalogItem
             {
